@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>WebCodec Demo</title>
+    <style>
+        video {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h3>WebCodec API Test</h3>
+    <p>This page plays H264 file via &lt;video&gt; tag but display attribute is set to **none**. Once the state is set to **play**, following processes are activated:</p>
+    <p>* Render the video content to a Bitmap, then encode the Bitamp to VP09.00.10.08 stream by using WebCodec API</p>
+    <p>* Decode the encoded VP09.00.10.08 stream on the fly by using WebCodec API</p>
+    
+    <div>
+        <button id="play">Play</button>
+    </div>
+    <div>
+      <video id="sourceVideo" muted autoplay loop src="bbb.mp4"></video> <!-- won't show -->
+    </div>
+    <div>
+      <p>Render mp4 video to canvas:</p>
+      <Canvas id="srcCanvas"></Canvas>
+    </div>
+
+    <div>
+      <p>Read frame from Canvas, encode to VP09.00.10.08, then decode to display:</p>
+      <Canvas id="dstCanvas"></Canvas>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
