@@ -1,14 +1,14 @@
 const canvasWidth = 320;
 const canvasHeight = 160;
+let webcodecSupported = true;
 let keepGoing = true;
 let pendingOutputFrame = 0;
 let ts = 0;
-let ready_frames = [];
 
-window.reqAnimation = window.mozRequestAnimationFrame
-    || window.requestAnimationFrame
-    || window.webkitRequestAnimationFrame
-    || window.msRequestAnimationFrame;
+if (!("VideoEncoder" in window)) {
+	document.body.innerHTML = "<h1>WebCodecs API is not supported.</h1>";
+	webcodecSupported = false;
+}
 
 function srcCanvas() {
     const canvas = document.getElementById('srcCanvas');
@@ -25,9 +25,6 @@ function dstCanvas() {
     canvas.height = canvasHeight;
     return [canvas, ctx];   
 }
-
-const [src_canvas, src_ctx] = srcCanvas();
-const [dst_canvas, dst_ctx] = dstCanvas();
 
 function handleChunk(chunk) {
     //console.log("enter encoder::handleFrame");
@@ -87,30 +84,8 @@ function getVideoDecoder() {
     return decoder;
 }
 
-const video = document.getElementById('sourceVideo');
-video.addEventListener('play', (e) => {
-    play();
-});
-
-const playBtn = document.getElementById('play');
-playBtn.addEventListener('click', event => {
-    if (video.paused == false) {
-        video.pause();
-        keepGoing = false;
-        playBtn.innerHTML = "Play";
-    } else {
-        video.play();
-        keepGoing = true;
-        playBtn.innerHTML = "Pause";
-    }
-})
-
-
-
-const encoder = getVideoEncoder();
-const decoder = getVideoDecoder();
-
 async function play() {
+
     computeFrame(video, src_ctx);
     if (video.paused || video.ended) return;
     reqAnimation(play);
@@ -140,3 +115,36 @@ function computeFrame(video, ctx) {
     const height = canvasHeight;
     ctx.drawImage(video, 0, 0, width, height);
 }
+//----------------------------------------------------
+
+if (!webcodecSupported) {
+	throw new Error("webcodecs are not supproted!");
+}
+
+window.reqAnimation = window.mozRequestAnimationFrame
+|| window.requestAnimationFrame
+|| window.webkitRequestAnimationFrame
+|| window.msRequestAnimationFrame;
+
+const [src_canvas, src_ctx] = srcCanvas();
+const [dst_canvas, dst_ctx] = dstCanvas();
+let video = document.getElementById('sourceVideo');
+video.addEventListener('play', (e) => {
+	play();
+});
+
+const playBtn = document.getElementById('play');
+playBtn.addEventListener('click', event => {
+	if (video.paused == false) {
+    	video.pause();
+    	keepGoing = false;
+    	playBtn.innerHTML = "Play";
+	} else {
+    	video.play();
+    	keepGoing = true;
+    	playBtn.innerHTML = "Pause";
+	}
+})
+
+const encoder = getVideoEncoder();
+const decoder = getVideoDecoder();
